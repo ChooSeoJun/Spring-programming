@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Calculation</title>
+        <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    </head>
+    <body>
+        
+        <form method="get" action="/calculate">
+            <input name="num1">
+            <select name="operator">
+                <option value="0">+</option>
+                <option value="1">-</option>
+                <option value="2">*</option>
+                <option value="3">/</option>
+            </select>
+            <input name="num2">
+            <button>Calculation</button>
+        </form> <!--1-->
+        <br>
+        <input id="num1">
+        <select id="operator2">
+            <option value="0">+</option>
+            <option value="1">-</option>
+            <option value="2">*</option>
+            <option value="3">/</option>
+        </select>
+        <input id="num2">
+        <button onclick="send()">Calculation</button>
+        <script>
+            function send(){
+                let num1 = $("#num1").val();
+                let num2 = $("#num2").val();
+                let sel = document.getElementById("operator2");
+                let operator = sel.options[sel.selectedIndex].value;
+                if(num1 == null) num1 = 0;
+                if(num2 == null) num2 = 0;
+                if(operator == null) operator = 0;
+                location.href = "calculateParse/" + num1 + "/" + num2 + "/" + operator;
+            }
+        </script><!--2-->
+    </body>
+</html>
