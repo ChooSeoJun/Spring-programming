@@ -7,9 +7,9 @@
     </head>
     <body>
         <div>
-            <input id="num1">
-            <input id="num2">
-            <input type="radio" name="sign" value="plus">+
+            <input id="num1" type="number">
+            <input id="num2" type="number"> <!--required !-->
+            <input type="radio" name="sign" value="plus" checked="true">+
             <input type="radio" name="sign" value="minus">-
             <input type="radio" name="sign" value="multi">×
             <input type="radio" name="sign" value="divide">÷
@@ -29,7 +29,7 @@
                     }
                 }
                 let response = await $.get("/calculator/" + num1 + "/" + num2 + "/" + sign);
-                $('#response').html(JSON.stringify(response));
+                $('#response').html(response); // JSON.stringify(response)
             }
         </script>
     </body>

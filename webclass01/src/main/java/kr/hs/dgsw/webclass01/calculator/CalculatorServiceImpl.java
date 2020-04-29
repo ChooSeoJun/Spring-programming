@@ -25,5 +25,17 @@ public class CalculatorServiceImpl implements CalculatorService{
         }
         return result;
     }
+    @Override
+    public boolean hasNull(String num) {
+        if(num.equals(null))
+            return true;
+        return false;
+    }
+    @Override
+    public boolean isZeroDivide(String num, String sign) {
+        if(sign.equals("divide") && Integer.parseInt(num) == 0)
+            return true;
+        return false;
+    }
 
 }
