@@ -6,27 +6,47 @@
         <script src="http://code.jquery.com/jquery-latest.min.js"></script>
     </head>
     <body>
-        
+        <!-- <form method="get" action="/greeting">
+            <input name="say">
+            <input name="to">
+            <button>Submit</button>
+        </form>
+        <br>
+        <input id="say">
+        <input id="to">
+        <button onclick="send()">Submit</button>
+        <form method="POST" action="/greeting2">
+            <input name="say2">
+            <input name="to2">
+            <button>Submit</button>
+        </form>
+        <script>
+            function send(){
+                let say = $("#say").val();
+                let to = $("#to").val();
+                location.href = "greeting1/" + say + "/" + to;
+            }
+        </script> -->
         <form method="get" action="/calculate">
             <input name="num1">
+            <input name="num2">
             <select name="operator">
                 <option value="0">+</option>
                 <option value="1">-</option>
                 <option value="2">*</option>
                 <option value="3">/</option>
             </select>
-            <input name="num2">
             <button>Calculation</button>
-        </form> <!--1-->
+        </form>
         <br>
         <input id="num1">
+        <input id="num2">
         <select id="operator2">
             <option value="0">+</option>
             <option value="1">-</option>
             <option value="2">*</option>
             <option value="3">/</option>
         </select>
-        <input id="num2">
         <button onclick="send()">Calculation</button>
         <script>
             function send(){
@@ -39,6 +59,6 @@
                 if(operator == null) operator = 0;
                 location.href = "calculateParse/" + num1 + "/" + num2 + "/" + operator;
             }
-        </script><!--2-->
+        </script>
     </body>
 </html>

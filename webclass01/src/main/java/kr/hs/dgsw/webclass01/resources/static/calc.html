@@ -7,9 +7,9 @@
     </head>
     <body>
         <div>
-            <input id="num1" type="number">
-            <input id="num2" type="number"> <!--required !-->
-            <input type="radio" name="sign" value="plus" checked="true">+
+            <input id="num1">
+            <input id="num2">
+            <input type="radio" name="sign" value="plus">+
             <input type="radio" name="sign" value="minus">-
             <input type="radio" name="sign" value="multi">×
             <input type="radio" name="sign" value="divide">÷
@@ -20,16 +20,15 @@
             async function calc(){
                 let num1 = $('#num1').val().trim();
                 let num2 = $('#num2').val().trim();
-                let sign;
-                let signs = document.getElementsByName("sign");
-                for(let i = 0; i<signs.length;i++){
-                    if(signs[i].checked == true){
-                        sign = signs[i].value;
+                let sign = document.getElementById("sign");
+                for(let i = 0; i<sign.length;i++){
+                    if(sign[i].checked == true){
+                        sign = sign[i].value;
                         break;
                     }
                 }
                 let response = await $.get("/calculator/" + num1 + "/" + num2 + "/" + sign);
-                $('#response').html(response); // JSON.stringify(response)
+                $('#response').html(JSON.stringify(response));
             }
         </script>
     </body>
