@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+        <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+        <style>
+            .userTable td{
+              width: 120px;  
+            }
+            .commentTable td{
+              width: 200px;  
+            }           
+        </style>
+    </head>
+    <body>
+        <div>
+            <h3>회원 가입</h3>
+            <div>
+                <span>username</span>
+                <input id="username" type="text"><br>
+                <span>email</span>
+                <input id="email" type="text"><br>
+                <span>password</span>
+                <input id="password" type="password"><br>
+                <button>확인</button>
+                 <button>취소</button>
+            </div><br>
+            <div>
+                <h3>댓글</h3>
+                <span>content</span>
+                <input id="txtComment" type="text">
+                <button>확인</button>
+            </div>
+            <div>
+                <h3>회원 목록</h3>
+                <table class="userTable">
+                    <tbody>
+                        <tr>
+                            <td>aaa</td>
+                            <td>aaa@dgsw</td>
+                            <td>1234</td>
+                            <td>
+                                <input type="file" id="btnFile">
+                            </td>
+                            <td>"C://"</td>
+                            <td>
+                                <button>수정</button>
+                                <button>삭제</button>
+                                <button>이미지</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <h3>댓글 목록</h3>
+                <table class="commentTable">
+                    <tbody>
+                        <tr>
+                            <td>aaa</td>
+                            <td>hi there 1</td>
+                            <td>
+                                <button>수정</button>
+                                <button>삭제</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <button id="signInSubmit" onclick="login()">로그인</button>
+            </div>
+        </div>
+        <script>
+            function login(){
+                window.open("popup.html","login","width=300,height=360");
+            }
+        </script>
+    </body>
+</html> 

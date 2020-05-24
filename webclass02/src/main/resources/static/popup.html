@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <style>
+        .popUpLogin{
+            display: block;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="popUpLogin">
+        <p>로그인</p>
+        <input type="text" id="signInID"><br>
+        <input type="password" id="signInPwd"><br>
+        <button onclick="close();">확인</button>
+        <button onclick="close();">취소</button>
+    </div>
+    <script>
+        function close(){
+            window.close();
+        }
+    </script>
+</body>
+</html>
