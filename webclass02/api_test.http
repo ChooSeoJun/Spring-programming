@@ -7,7 +7,8 @@ Content-Type: application/json
 
 {
   "username": "bbb",
-  "email": "bbb@dgsw"
+  "email": "bbb@dgsw",
+  "password":"333"
 }
 
 ###

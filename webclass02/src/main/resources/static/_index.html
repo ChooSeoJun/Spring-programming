@@ -24,7 +24,7 @@
                 <span>password</span>
                 <input id="password" type="password"><br>
                 <button>확인</button>
-                 <button>취소</button>
+                <button>취소</button>
             </div><br>
             <div>
                 <h3>댓글</h3>
@@ -75,6 +75,19 @@
         <script>
             function login(){
                 window.open("popup.html","login","width=300,height=360");
+            }
+            async function signUp(){
+                let num1 = $('#username').val().trim();
+                let num2 = $('#num2').val().trim();
+                let sign = document.getElementById("sign");
+                for(let i = 0; i<sign.length;i++){
+                    if(sign[i].checked == true){
+                        sign = sign[i].value;
+                        break;
+                    }
+                }
+                let response = await $.get("/calculator/" + num1 + "/" + num2 + "/" + sign);
+                $('#response').html(JSON.stringify(response));
             }
         </script>
     </body>
