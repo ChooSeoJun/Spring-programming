@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
     <title></title>
     <style>
         .popUpLogin{
@@ -16,12 +17,34 @@
         <p>로그인</p>
         <input type="text" id="signInID"><br>
         <input type="password" id="signInPwd"><br>
-        <button onclick="close();">확인</button>
-        <button onclick="close();">취소</button>
+        <button onclick="signInUser();">확인</button>
+        <button onclick="closePopup();">취소</button>
     </div>
     <script>
-        function close(){
+        function closePopup(){
             window.close();
+        }
+        function signInUser(){
+
+            let email = $('#signInId').val();
+            let password = $('#signInPwd').val();
+            
+            console.log(email + " " + password);
+
+            $.ajax({
+                url: "http://localhost:8080/user/login",
+                method: "POST",
+                dataType: "json",
+                contentType:"application/json",
+                data: JSON.stringify({
+                    email,
+                    password
+                }),
+                success: function(res) {
+                    console.log(res);
+                }
+            })
+            closePopup();
         }
     </script>
 </body>

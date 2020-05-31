@@ -19,6 +19,8 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,9 +39,10 @@ public class AttachmentController {
     @Autowired
     CommentRepository commentRepository;
 
-    @PostMapping("/attachment")
-    public AttachmentProtocol upload(@RequestPart MultipartFile srcFile){
-        String destFilename = "C:/SBEX/webclass02/upload"
+    // @PostMapping("/attachment")
+    @RequestMapping(value = "/attachment",method = RequestMethod.POST)
+    public AttachmentProtocol upload(@RequestPart("image") MultipartFile srcFile){
+        String destFilename = "C:/Users/chu10/git_tmp/webclass02"
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
                 + UUID.randomUUID().toString() + "_" + srcFile.getOriginalFilename();
         try {

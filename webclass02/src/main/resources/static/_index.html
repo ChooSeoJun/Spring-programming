@@ -10,85 +10,425 @@
             }
             .commentTable td{
               width: 200px;  
-            }           
+            }
+            #popUpLogin{
+                display: none;
+            }
+            #userProfile{
+                display: none;
+            }
         </style>
     </head>
-    <body>
+    <body onload="loadComments(); loadUserList();">
         <div>
             <h3>회원 가입</h3>
-            <div>
+            <form method="POST">
                 <span>username</span>
                 <input id="username" type="text"><br>
                 <span>email</span>
                 <input id="email" type="text"><br>
                 <span>password</span>
                 <input id="password" type="password"><br>
-                <button>확인</button>
-                <button>취소</button>
-            </div><br>
+                <button onclick="signUp(); return false;">확인</button>
+                <button onclick="clearCells(); return false;">취소</button>
+            </form><br>
             <div>
                 <h3>댓글</h3>
                 <span>content</span>
                 <input id="txtComment" type="text">
-                <button>확인</button>
+                <button onclick="addComment();">확인</button>
             </div>
             <div>
                 <h3>회원 목록</h3>
                 <table class="userTable">
-                    <tbody>
-                        <tr>
-                            <td>aaa</td>
-                            <td>aaa@dgsw</td>
-                            <td>1234</td>
-                            <td>
-                                <input type="file" id="btnFile">
-                            </td>
-                            <td>"C://"</td>
-                            <td>
-                                <button>수정</button>
-                                <button>삭제</button>
-                                <button>이미지</button>
-                            </td>
-                        </tr>
+                    <tbody id="userList">
                     </tbody>
                 </table>
             </div>
+
             <div>
                 <h3>댓글 목록</h3>
                 <table class="commentTable">
-                    <tbody>
-                        <tr>
-                            <td>aaa</td>
-                            <td>hi there 1</td>
-                            <td>
-                                <button>수정</button>
-                                <button>삭제</button>
-                            </td>
-                        </tr>
+                    <tbody id="commentList">
                     </tbody>
                 </table>
             </div>
             <div>
-                <button id="signInSubmit" onclick="login()">로그인</button>
+                <button onclick="popUpLoginVisible();">로그인</button>
+            </div>
+            <div id="userProfile">
+                <p id="txtUserId"></p>
+                <p>SignIn</p>
+            </div>
+            <div id="popUpLogin">
+                <p>로그인</p>
+                <input type="email" id="signInID"><br>
+                <input type="password" id="signInPwd"><br><br>
+                <button onclick="login();">확인</button>
+                <button onclick="closeSignIn();">취소</button>
             </div>
         </div>
         <script>
+            var user;
+            var message;
+            var fixedUsername;
+            var fixedEmail;
+            var fixedPassword;
+
+            function popUpLoginVisible(){
+                document.getElementById("popUpLogin").style.display="block";
+            }
+            function closeSignIn(){
+                document.getElementById("popUpLogin").style.display="none";
+            }
+            function showUserId(){
+                document.getElementById("userProfile").style.display="block";
+            }
             function login(){
-                window.open("popup.html","login","width=300,height=360");
-            }
-            async function signUp(){
-                let num1 = $('#username').val().trim();
-                let num2 = $('#num2').val().trim();
-                let sign = document.getElementById("sign");
-                for(let i = 0; i<sign.length;i++){
-                    if(sign[i].checked == true){
-                        sign = sign[i].value;
-                        break;
+                let email = $('#signInID').val();
+                let password = $('#signInPwd').val();
+                
+                console.log(email + " " + password);
+
+                $.ajax({
+                    url: "http://localhost:8080/user/login",
+                    method: "POST",
+                    dataType: "json",
+                    contentType:"application/json",
+                    data: JSON.stringify({
+                        email,
+                        password
+                    }),
+                    success: function(res) {
+                        console.log(res);
+                        $('#txtUserId').text(res.email);
+                        user = res;
+                        showUserId();
+                        closeSignIn();
                     }
-                }
-                let response = await $.get("/calculator/" + num1 + "/" + num2 + "/" + sign);
-                $('#response').html(JSON.stringify(response));
+                })
+            }            
+            
+            function addComment(){
+                let content = $("#txtComment").val();
+                let userId = user.id;
+                $.ajax({
+                    url: "http://localhost:8080/comment/add",
+                    method: "POST",
+                    dataType: "json",
+                    contentType:"application/json",
+                    data: JSON.stringify({
+                        userId,
+                        content,
+                    }),
+                    success: function(res) {
+                        console.log(res);
+                        loadComments();
+                    }
+                })
             }
+            function clearCells(){
+                $('#username').val("");
+                $('#email').val("");
+                $('#password').val("");
+            }
+            function signUp(){
+                let username = $('#username').val();
+                let email = $('#email').val();
+                let password = $('#password').val();
+                
+                console.log(username + " " + email + " " + password);
+
+                $.ajax({
+                    url: "http://localhost:8080/user/add",
+                    method: "POST",
+                    dataType: "json",
+                    contentType:"application/json",
+                    async:false,
+                    data: JSON.stringify({
+                        username,
+                        email,
+                        password
+                    }),
+                    success: function(res) {
+                        console.log(res);
+                        
+                    }
+                })
+                loadUserList();
+                clearCells();
+                
+            }        
+
+            function deleteImage(clicked_id) {
+                $.ajax({
+                    type:"POST",
+                    url:'http://localhost:8080/attachment',
+                    data:null,
+                    enctype: 'multipart/form-data',
+                    processData: false,
+                    contentType: false,
+                    cache: false,
+                    success: function() {
+                        updateUserImage(clicked_id,null,null);
+                    },
+                    error: function(res) {
+                        console.log(res);
+                    }
+                });
+                fileInfoHide();
+            }
+            function uploadImage(clicked_id){
+                var srcFile = new FormData($(`#uploadFileForm${clicked_id}`)[0]);
+
+                console.log(srcFile);
+
+                 $.ajax({
+                    type:"POST",
+                    url:'http://localhost:8080/attachment',
+                    data: srcFile,
+                    enctype: 'multipart/form-data',
+                    processData: false,
+                    contentType: false,
+                    cache: false,
+                    success: function(res) {
+                        updateUserImage(clicked_id,res.storedPath,res.originalName);
+                    },
+                    error:function(res){
+                        console.log(res);
+                    }
+                })
+            }
+
+            function loadUserList(){
+                $.ajax({
+                    url: "http://localhost:8080/user/list",
+                    method: "GET",
+                    dataType: "json",
+                    contentType:"application/json",
+                    success: function(data) {
+                        $('#userList').empty();
+                        data.forEach(function(item,index,list){
+                            var html = "<tr>" +
+                            "<td>" + item.username + "</td>" +
+                            "<td>" + item.email + "</td>" +
+                            "<td>" + item.password + "</td>" +
+                            "<td id=\"storedPath" + item.id + "\">" + item.storedPath + "</td>" + 
+                            "<td id=\"originalName" + item.id + "\">" + item.originalName + "</td>" + 
+                            "<td id=\"uploadInput" + item.id + "\"><form id=\"uploadFileForm" + item.id + "\">" + 
+                                "<input id=\"uploadFile" + item.id + "\" type=\"file\" name=\"image\" accept=\"image/jpeg, image/png, image/gif\">" + 
+                                "<button id=\"uploadImage"+ item.id + "\" name=" + item.id + " onclick=\"uploadImage(this.name); return false;\">업로드</button>" + // showImageDeleteButton(this.name);
+                                // "<button id=\"deleteImage"+ item.id + "\" name=" + item.id + " onclick=\"showUploadButton(this.name); deleteImage(this.name); return false;\">삭제</button>" + 
+                            "</form></td>" +     
+                            "<td>" +"<button id=\"btnUpdateUser"+ item.id +"\" name=" + item.id + " onclick=\"showUserButtons(this.name, " + item.username + ", " + item.email + ", " + item.password + ");\">수정</button>" + 
+                                    "<button id=\"btnDeleteUser"+ item.id +"\" name=" + item.id + " onclick=\"deleteUser(this.name);\">삭제</button>" +
+                                    "<button id=\"btnSubmitUser"+ item.id +"\" name=" + item.id + " onclick=\"updateUser(this.name, fixedUsername,fixedEmail,fixedPassword);\" style=\"display:none;\">확인</button>" +
+                                    "<button id=\"btnCancelUser"+ item.id +"\" name=" + item.id + " onclick=\"hideUserButtons(this.name);\" style=\"display:none;\">취소</button>" +
+                                    "<button id=\"btnShowUser"+ item.id +"\" name=" + item.id + " onclick=\"showUser(this.name);\">이미지</button>" + "</td>" + 
+                            "<td>" + "<img id=\"userImage" + item.id + "\">"
+                            "</tr>";
+                            $('#userList').append(html); // append or html;
+                            if(item.storedPath != null && item.originalName != null){
+                                fileInfoShow(item.id);
+                                document.getElementById("uploadImage" + item.id).style.display = "none";
+                            }
+                        })
+                    }
+                })
+                
+            }
+
+            function showUser(clicked_id){
+                var id = parseInt(clicked_id);
+                console.log(id);
+                var user = "user";
+
+                window.location = "http://localhost:8080/attachment/" + user + "/" + id;
+            }
+
+            function showUserButtons(clicked_id, username, email, password){
+                document.getElementById("btnSubmitUser" + clicked_id).style.display="inline";
+                document.getElementById("btnCancelUser" + clicked_id).style.display="inline";
+                document.getElementById("btnUpdateUser" + clicked_id).style.display="none";
+                document.getElementById("btnDeleteUser" + clicked_id).style.display="none";
+
+                fixedUsername = null;
+                fixedEmail = null;
+                fixedPassword = null;
+
+                fixedUsername = prompt("변경할 유저 이름을 작성하십시오.\n변경을 원하지 않을 시 취소하십시오.",username);
+                fixedEmail = prompt("변경할 아이디를 작성하십시오.\n변경을 원하지 않을 시 취소하십시오.",email);
+                fixedPassword = prompt("변경할 비밀번호를 작성하십시오.\n변경을 원하지 않을 시 취소하십시오.",password);
+
+                if(!fixedUsername) fixedUsername = username;
+                if(!fixedEmail) fixedEmail = email;
+                if(!fixedPassword) fixedPassword = password;
+
+            }
+
+            function hideUserButtons(clicked_id){
+                document.getElementById("btnUpdateUser" + clicked_id).style.display="inline";
+                document.getElementById("btnDeleteUser" + clicked_id).style.display="inline";
+                document.getElementById("btnSubmitUser" + clicked_id).style.display="none";
+                document.getElementById("btnCancelUser" + clicked_id).style.display="none";
+            }
+
+            function deleteUser(clicked_id){
+                var id = parseInt(clicked_id);
+                console.log(id);
+
+                $.ajax({
+                    url: "http://localhost:8080/user/delete/" + id,
+                    method: "DELETE",
+                    dataType: "json",
+                    contentType:"application/json",
+                    success: function(data) {
+                        loadUserList();
+                    }
+                })
+            }
+
+            function fileInfoShow(id){
+                document.getElementById("uploadFile" + id).style.display = "none";
+                document.getElementById("storedPath" + id).style.display = "inline";
+                document.getElementById("originalName" + id).style.display = "inline";
+            }
+
+
+            function fileInfoHide(id){
+                document.getElementById("uploadFile" + id).style.display = "inline";
+                document.getElementById("storedPath" + id).style.display = "none";
+                document.getElementById("originalName" + id).style.display = "none";
+            }
+            
+            function updateUser(clicked_id, username, email, password){
+                var id = parseInt(clicked_id);
+                                    
+                $.ajax({
+                    url: "http://localhost:8080/user/update/" + id,
+                    method: "PUT",
+                    dataType: "json",
+                    contentType:"application/json",
+                    data:JSON.stringify({
+                        username,
+                        email,
+                        password
+                    }),
+                    success: function(data) {
+                        console.log(data);
+                        loadUserList();
+                        hideUserButtons();
+                    }
+                })
+            }
+
+            function updateUserImage(clicked_id,storedPath,originalName){
+                var id = parseInt(clicked_id);
+                                    
+                $.ajax({
+                    url: "http://localhost:8080/user/update/" + id,
+                    method: "PUT",
+                    dataType: "json",
+                    contentType:"application/json",
+                    data:JSON.stringify({
+                        storedPath,
+                        originalName
+                    }),
+                    success: function(data) {
+                        console.log(data);
+                        loadUserList();
+                    }
+                })
+            }
+
+            function loadComments(){
+
+                if(user == null){
+                    return;
+                }
+
+                $.ajax({
+                    url: "http://localhost:8080/comment/list",
+                    method: "GET",
+                    dataType: "json",
+                    contentType:"application/json",
+                    success: function(data) {
+                        
+                        $('#commentList').empty();
+                        data.forEach(function(item,index,list){
+                            var html = "<tr>" +
+                            "<td>" + item.username + "</td>" +
+                            "<td>" + item.content + "</td>" +
+                            "<td>" + "<button id=\"btnUpdateComment"+ item.id +"\" name=" + item.id + " onclick=\"showCommentButtons(this.name);\">수정</button>" + 
+                                     "<button id=\"btnDeleteComment"+ item.id +"\" name=" + item.id + " onclick=\"deleteComment(this.name);\">삭제</button>" +
+                                     "<button id=\"btnSubmitComment"+ item.id +"\" name=" + item.id + " onclick=\"updateComment(this.name, "+ item.userId + ");\" style=\"display:none;\">확인</button>" +
+                                     "<button id=\"btnCancelComment"+ item.id +"\" name=" + item.id + " onclick=\"hideCommentUpdate(this.name);\" style=\"display:none;\">취소</button>" + "</td>" + 
+                            "</tr>";
+                            $('#commentList').append(html); // append or html;
+                        })
+                    }
+                })
+            }
+
+            function showCommentButtons(clicked_id){
+                message = "";
+                document.getElementById("btnUpdateComment" + clicked_id).style.display="none";
+                document.getElementById("btnDeleteComment" + clicked_id).style.display="none";
+                document.getElementById("btnSubmitComment" + clicked_id).style.display="inline";
+                document.getElementById("btnCancelComment" + clicked_id).style.display="inline";
+                var inputMessage = prompt("수정할 내용을 입력하세요.");
+                if(!inputMessage){
+                    hideCommentUpdate(clicked_id);
+                }else{
+                    message = inputMessage;
+                }
+            }
+
+            function hideCommentUpdate(clicked_id){
+                document.getElementById("btnSubmitComment" + clicked_id).style.display="none";
+                document.getElementById("btnCancelComment" + clicked_id).style.display="none";
+                document.getElementById("btnUpdateComment" + clicked_id).style.display="inline";
+                document.getElementById("btnDeleteComment" + clicked_id).style.display="inline";
+            }
+
+            function updateComment(clicked_id, clicked_userId){
+                var id = parseInt(clicked_id);
+                var userId = parseInt(clicked_userId);
+                var content = message;
+                console.log("id: " + id);
+                console.log("content: " + content);
+                console.log("userId: " + userId);
+                $.ajax({
+                    url: "http://localhost:8080/comment/update/" + id,
+                    method: "PUT",
+                    dataType: "json",
+                    contentType:"application/json",
+                    data:JSON.stringify({
+                        userId,
+                        content
+                    }),
+                    success: function(data) {
+                        console.log(data);
+                        loadComments();
+                        hideCommentUpdate();
+                    }
+                })
+            }
+
+            function deleteComment(clicked_id){
+                var id = parseInt(clicked_id);
+                console.log(id);
+                $.ajax({
+                    url: "http://localhost:8080/comment/remove/" + id,
+                    method: "DELETE",
+                    dataType: "json",
+                    contentType:"application/json",
+                    success: function(data) {
+                        loadComments();
+                    }
+                })
+            }
+
         </script>
     </body>
-</html> 
+</html>

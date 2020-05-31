@@ -36,7 +36,7 @@ public class CommentController {
     public CommentUsernameProtocol view(@PathVariable Long id){
         return commentService.view(id);
     }
-    @GetMapping("comment/list")
+    @GetMapping("/comment/list")
     public List<CommentUsernameProtocol> listAllComments(){
         return commentService.listAllComments();
     }

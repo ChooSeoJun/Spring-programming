@@ -35,7 +35,8 @@ public class UserServiceImpl implements UserService{
         return userRepository.findById(id)
                 .map(found ->{
                     found.setUsername(Optional.ofNullable(user.getUsername()).orElse(found.getUsername()));
-                    found.setEmail(Optional.ofNullable(user.getEmail()).orElse(found.getEmail()));
+					found.setEmail(Optional.ofNullable(user.getEmail()).orElse(found.getEmail()));
+					found.setPassword(Optional.ofNullable(user.getPassword()).orElse(found.getPassword()));
                     found.setOriginalName(Optional.ofNullable(user.getOriginalName()).orElse(found.getOriginalName()));
                     found.setStoredPath(Optional.ofNullable(user.getStoredPath()).orElse(found.getStoredPath()));
                     return userRepository.save(found);

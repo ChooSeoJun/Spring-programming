@@ -24,8 +24,8 @@ public class CommentServiceImpl implements CommentService{
     
     @PostConstruct
     private void init(){
-        User u = userRepository.save(new User("추서준","chuseojun@dgsw.hs.kr","1234","C:/","chuseojun"));
-        commentRepository.save(new Comment(u.getId(), "hi there","C:/","ikmyung"));
+        // User u = userRepository.save(new User("추서준","chuseojun@dgsw.hs.kr","1234","C:/","chuseojun"));
+        // commentRepository.save(new Comment(u.getId(), "hi there","C:/","ikmyung"));
     }
 
 	@Override
@@ -47,7 +47,7 @@ public class CommentServiceImpl implements CommentService{
                         found.setStoredPath(Optional.ofNullable(comment.getStoredPath()).orElse(found.getStoredPath()));
                         found.setOriginalName(Optional.ofNullable(comment.getOriginalName()).orElse(found.getOriginalName()));
                         commentRepository.save(found);
-                        return new CommentUsernameProtocol(found,user.get().getUsername());
+                        return new CommentUsernameProtocol(found, user.get().getUsername());
                     }).orElse(null);
         }                
         return null;
