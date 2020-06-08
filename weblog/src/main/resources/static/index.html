@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>WebBlog</title>
+        <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+        <style>
+            .userTable td{
+              width: 200px;  
+            }
+            #postForm, #fixedUsername, #fixedUserAccount, #fixedUserPassword, #fixedUserEmail, #fixedUserPhone,#fixedPostTitle,#fixedPostContent, #userDetail, #postDetail, .btnApplyUpdate, .btnCancelUpdate{
+                display: none;
+            }
+            #userDetail{
+                border: 1px solid gray; 
+                width: 300px; 
+                height: 350px;
+            }
+        </style>
+    </head>
+
+    <body onload="showUserForm();">
+        <div>
+            <button onclick="showUserForm();">사용자</button>
+            <button onclick="showPostForm();">게시물</button>
+        </div>
+        <div id="userForm">
+            <br>
+            <h3>회원 가입</h3>
+            <form method="POST">
+                <span>account</span>
+                <input id="account" type="text"><br>
+                <span>username</span>
+                <input id="name" type="text"><br>
+                <span>password</span>
+                <input id="password" type="password"><br>
+                <span>email</span>
+                <input id="email" type="text"><br>
+                <span>phone</span>
+                <input id="phone" type="text"><br><br>
+                <button onclick="signUp(); return false;">확인</button>
+                <button onclick="clearCells(); return false;">취소</button>
+            </form><br><br>
+            
+            <button onclick="showAllUser();">전체 사용자</button><br>
+            <div>
+                <h3>회원 목록</h3>
+                <table class="userTable">
+                    <tbody id="userList"></tbody>
+                </table>
+            </div><br><br>
+            <div id="userDetail">
+                <button onclick="closeUserDetail();">상세 정보 닫기</button><br>
+                <span id="titleUserAccount">아이디:</span>
+                <span id="txtUserAccount"></span><br>
+
+                <span>유저명: </span>
+                <span id="txtUsername"></span>
+                <input id="fixedUsername"><br>
+                
+                <!-- <input id="fixedUserAccount"> -->
+
+                <!-- <span>비밀번호: </span>
+                <span id="txtUserPassword"></span>
+                <input id="fixedUserPassword"><br> -->
+
+                <span>이메일: </span>
+                <span id="txtUserEmail"></span>
+                <input id="fixedUserEmail"><br>
+
+                <span>전화번호: </span>
+                <span id="txtUserPhone"></span>
+                <input id="fixedUserPhone"><br>
+                <div id="userUpdateButtons">
+
+                </div>
+            </div>
+
+        </div>
+        <div id="postForm">
+            <br>
+            <h3>글 작성</h3>
+            <form method="POST">
+                <span>title</span>
+                <input id="postTitle" type="text"><br>
+                <span>content</span>
+                <textarea id="postContent"></textarea><br><br>
+                
+                <button onclick="createPost(); return false;">확인</button>
+                <button onclick="clearPostCells(); return false;">취소</button>
+            </form><br><br>
+            
+            <input id="searchById">
+            <button onclick="findPostByUserId();">검색</button><br><br>
+            <button onclick="showAllPost();">전체 게시물</button><br>
+            <div>
+                <h3>게시글 목록</h3>
+                <table class="postTable">
+                    <tbody id="postList"></tbody>
+                </table>
+            </div><br><br>
+            <div id="postDetail">
+                <button onclick="closePostDetail();">상세 정보 닫기</button><br>
+
+                <span>제목: </span>
+                <span id="txtPostTitle"></span>
+                <input id="fixedPostTitle"><br>
+
+                <span>내용: </span>
+                <span id="txtPostContent"></span>
+                <input id="fixedPostContent"><br>
+
+                <div id="postUpdateButtons">
+
+                </div>
+            </div>
+        </div>
+        <div>
+
+        </div>
+        <script>
+
+            function findPostByUserId(){
+                var userId = $('#searchById').val();
+                console.log("기본키: " + userId + " 인 유저의 게시물을 불러옵니다.");
+                $.ajax({
+                    url: "http://localhost:8080/post/read/user/" + userId,
+                    type: "GET",
+                    contentType:"application/json",
+                    success: function(res) {
+                        $('#postList').empty();
+                        console.log(res.data);
+                        var html = 
+                        "<tr onclick=\"showPostDetail(" + res.data.id + ");\">" +
+                        "<td>" + res.data.title + "</td>" +
+                        "<td>" + res.data.content + "</td>" +
+                        "</tr>";
+                        $('#postList').append(html);
+                    },
+                    error: function(res){
+                        console.log(res.data);
+                    }
+                })
+
+            }
+
+            function showUserForm(){
+
+                console.log("유저 form 불러오기");
+
+                $('#userForm').show();
+                $('#postForm').hide();
+            }
+    
+            function showPostForm(){
+                console.log("게시물 form 불러오기");
+
+                $('#userForm').hide();
+                $('#postForm').show();
+            }
+            function clearCells(){
+
+                console.log("회원가입 기입 정보를 제거합니다.");
+
+                $('#name').val("");
+                $('#account').val("");
+                $('#email').val("");
+                $('#password').val("");
+                $('#phone').val("");
+            }
+
+            function clearPostCells(){
+
+                console.log("작성중인 게시물을 제거합니다.");
+
+                $('#postTitle').val("");
+                $('#postContent').val("");
+            }
+
+
+            function signUp(){
+
+                console.log("회원가입을 진행합니다.");
+
+                let name = $('#name').val();
+                let email = $('#email').val();
+                let password = $('#password').val();
+                let account = $('#account').val();
+                let phone = $('#phone').val();
+
+                $.ajax({
+                    url: "http://localhost:8080/user/create",
+                    method: "POST",
+                    dataType: "json",
+                    contentType:"application/json",
+                    async:false,
+                    data: JSON.stringify({
+                        name,
+                        email,
+                        password,
+                        account,
+                        phone
+                    }),
+                    success: function(res) {
+                        window.sessionStorage.setItem("id", res.data.id);
+                        console.log("회원가입이 완료되었습니다.");   
+                    }
+                })
+                clearCells();
+            }
+
+            function createPost(){
+                
+                console.log("게시물 작성을 진행합니다.");
+
+                let title = $('#postTitle').val();
+                let content = $('#postContent').val();
+                let userId = window.sessionStorage.getItem("id");
+                console.log(userId);
+
+                // console.log("title: " + title + "\ncontent: " + content + "\nuserId" + userId);
+
+                if(!userId){
+                    return;
+                }
+                
+                $.ajax({
+                    url: "http://localhost:8080/post/create",
+                    type: "POST",
+                    contentType:"application/json",
+                    async:false,
+                    data: JSON.stringify({
+                        userId,
+                        title,
+                        content
+                    }),
+                    success: function(res) {
+                        console.log(res.data);
+                        console.log("게시물 작성이 완료되었습니다.");   
+                    },
+                    error: function(e){
+                        console.log(e);
+                    }
+                })
+
+                
+                clearPostCells();
+            }
+
+            function closeUserDetail(){
+                console.log("유저 상세 정보창을 숨깁니다.");
+                $("#userDetail").hide();
+            }
+
+            function closePostDetail(){
+                console.log("게시물 상세 정보창을 숨깁니다.");
+                $("#postDetail").hide();
+            }
+
+            function showAllUser(){
+
+                console.log("모든 유저 목록을 불러옵니다.");
+
+                $.ajax({
+                    url: "http://localhost:8080/user/read",
+                    method: "GET",
+                    dataType: "json",
+                    contentType:"application/json",
+                    success: function(res) {
+                        $('#userList').empty();
+                        res.data.forEach(function(item,index,list){
+                            console.log(item);
+                            var html = 
+                            "<tr onclick=\"showUserDetail(" + item.id + ");\">" +
+                            "<td><img src=\"" + item.profilePath + "\"></td>" +
+                            "<td>" + item.name + "</td>" +
+                            "<td>" + item.account + "</td>" +
+                            "<td>" + item.email + "</td>" +
+                            "<td>" + item.phone + "</td>" +
+                            "</tr>";
+                            $('#userList').append(html);
+                        })
+                    },
+                    error: function(data){
+                        console.log(data);
+                    }
+                })
+            }
+
+            function showAllPost(){
+
+            console.log("모든 게시물 목록을 불러옵니다.");
+
+                $.ajax({
+                    url: "http://localhost:8080/post/read",
+                    method: "GET",
+                    dataType: "json",
+                    contentType:"application/json",
+                    success: function(res) {
+                        $('#postList').empty();
+                        res.data.forEach(function(item,index,list){
+                            console.log(item);
+                            var html = 
+                            "<tr onclick=\"showPostDetail(" + item.id + ");\">" +
+                            "<td><img src=\"" + item.userId + "\"></td>" +
+                            "<td>" + item.title + "</td>" +
+                            "<td>" + item.content + "</td>" +
+                            "</tr>";
+                            $('#postList').append(html);
+                        })
+                    },
+                    error: function(data){
+                        console.log(data);
+                    }
+                })
+            }
+
+            function showUserDetail(id){
+
+                console.log("해당 유저의 상세 정보를 불러옵니다.");
+                showUserInfo(id);
+
+                $("#userUpdateButtons").empty();
+                
+                var html =  
+                    "<button class=\"btnUpdate\" onclick=\"showUpdateArea();\">수정</button>" + 
+                    "<button class=\"btnDelete\" onclick=\"deleteUser(" + id + ");\">삭제</button>" + 
+                    "<button class=\"btnApplyUpdate\" onclick=\"applyUpdateUser(" + id + ");\">확인</button>" + 
+                    "<button class=\"btnCancelUpdate\" onclick=\"hideUpdateArea();\">취소</button>"
+                $('#userUpdateButtons').append(html);
+
+                $("#userDetail").show();
+            }
+
+            function showPostDetail(id){
+
+                console.log("해당 게시물의 상세 정보를 불러옵니다.");
+                showPostInfo(id);
+
+                $("#postUpdateButtons").empty();
+
+                var html =  
+                    "<button class=\"btnUpdate\" onclick=\"showUpdatePostArea();\">수정</button>" + 
+                    "<button class=\"btnDelete\" onclick=\"deletePost(" + id + ");\">삭제</button>" + 
+                    "<button class=\"btnApplyUpdate\" onclick=\"applyUpdatePost(" + id + ");\">확인</button>" + 
+                    "<button class=\"btnCancelUpdate\" onclick=\"hideUpdatePostArea();\">취소</button>"
+                $('#postUpdateButtons').append(html);
+
+                $("#postDetail").show();
+            }
+
+            function showUserInfo(id){
+                console.log("수정할 유저의 정보를 불러옵니다.");
+                $.ajax({
+                    url: "http://localhost:8080/user/read/" + id,
+                    method: "GET",
+                    dataType: "json",
+                    contentType:"application/json",
+                    success: function(res) {
+                        console.log(res.data);
+                        $('#txtUsername').text(res.data.name);
+                        $('#txtUserAccount').text(res.data.account);
+                        $('#txtUserEmail').text(res.data.email);
+                        // $('#txtUserPassword').text(res.data.password);
+                        $('#txtUserPhone').text(res.data.phone);
+                        hideUpdateArea();
+                    },
+                    error: function(data){
+                        console.log(data);
+                    }
+                })
+            }
+
+            function showPostInfo(id){
+                console.log("수정할 게시물의 정보를 불러옵니다.");
+                $.ajax({
+                    url: "http://localhost:8080/post/read/" + id,
+                    method: "GET",
+                    dataType: "json",
+                    contentType:"application/json",
+                    success: function(res) {
+                        console.log(res.data);
+                        $('#txtPostTitle').text(res.data.title);
+                        $('#txtPostContent').text(res.data.content);
+                        hideUpdatePostArea();
+                    },
+                    error: function(data){
+                        console.log(data);
+                    }
+                })
+            }
+
+            function setFixedArea(){
+                $('#fixedUsername').val($('#txtUsername').text());
+                // $('#fixedUserAccount').val($('#txtUserAccount').text());
+                $('#fixedUserEmail').val($('#txtUserEmail').text());
+                // $('#fixedUserPassword').val($('#txtUserPassword').text());
+                $('#fixedUserPhone').val($('#txtUserPhone').text());
+            }
+
+            function setPostFixedArea(){
+                $('#fixedPostTitle').val($('#txtPostTitle').text());
+                $('#fixedPostContent').val($('#txtPostContent').text());
+            }
+
+            function showUpdateArea(){
+                $("#titleUserAccount").hide();
+                $("#txtUsername").hide();
+                $("#txtUserAccount").hide();
+                $("#txtUserEmail").hide();
+                // $("#txtUserPassword").hide();
+                $("#txtUserPhone").hide();
+
+                $("#fixedUsername").show();
+                // $("#fixedUserAccount").show();
+                $("#fixedUserEmail").show();
+                // $("#fixedUserPassword").show();
+                $("#fixedUserPhone").show();
+
+                $(".btnUpdate").hide();
+                $(".btnDelete").hide();
+                $(".btnApplyUpdate").show();
+                $(".btnCancelUpdate").show();
+
+                setFixedArea();
+            }
+
+            function showUpdatePostArea(){
+                
+                $("#txtPostTitle").hide();
+                $("#txtPostContent").hide();
+
+                $("#fixedPostTitle").show();
+                $("#fixedPostContent").show();
+
+                $(".btnUpdate").hide();
+                $(".btnDelete").hide();
+                $(".btnApplyUpdate").show();
+                $(".btnCancelUpdate").show();
+
+                setPostFixedArea();
+            }
+
+            function hideUpdateArea(){
+                $("#titleUserAccount").show();
+                $("#txtUsername").show();
+                $("#txtUserAccount").show();
+                $("#txtUserEmail").show();
+                // $("#txtUserPassword").show();
+                $("#txtUserPhone").show();
+
+                $("#fixedUsername").hide();
+                // $("#fixedUserAccount").hide();
+                $("#fixedUserEmail").hide();
+                // $("#fixedUserPassword").hide();
+                $("#fixedUserPhone").hide();
+
+                $(".btnUpdate").show();
+                $(".btnDelete").show();
+                $(".btnApplyUpdate").hide();
+                $(".btnCancelUpdate").hide();
+            }
+
+            function hideUpdatePostArea(){
+                $("#txtPostTitle").show();
+                $("#txtPostContent").show();
+
+                $("#fixedPostTitle").hide();
+                $("#fixedPostContent").hide();
+
+                $(".btnUpdate").show();
+                $(".btnDelete").show();
+                $(".btnApplyUpdate").hide();
+                $(".btnCancelUpdate").hide();
+            }
+
+            function applyUpdateUser(id){
+                var name = $('#fixedUsername').val();
+                var email = $('#fixedUserEmail').val();
+                var phone = $('#fixedUserPhone').val();
+                
+                $.ajax({
+                    url: "http://localhost:8080/user/update/" + id,
+                    method: "PUT",
+                    dataType: "json",
+                    contentType:"application/json",
+                    data:JSON.stringify({
+                        name,
+                        email,
+                        phone
+                    }),
+                    success: function(data) {
+                        console.log(data);
+                        closeUserDetail();
+                        showAllUser();
+                    }
+                })
+            }
+
+            function applyUpdatePost(id){
+                var title = $('#fixedPostTitle').val();
+                var content = $('#fixedPostContent').val();
+                
+                $.ajax({
+                    url: "http://localhost:8080/post/update/" + id,
+                    method: "PUT",
+                    dataType: "json",
+                    contentType:"application/json",
+                    data:JSON.stringify({
+                        title,
+                        content
+                    }),
+                    success: function(data) {
+                        console.log(data);
+                        closePostDetail();
+                        showAllPost();
+                    }
+                })
+            }
+
+            function deleteUser(id){
+                console.log("해당 유저를 제거합니다.");
+                $.ajax({
+                    url: "http://localhost:8080/user/delete/" + id,
+                    method: "DELETE",
+                    dataType: "json",
+                    contentType:"application/json",
+                    success: function(data) {
+                        closeUserDetail();
+                        showAllUser();
+                    }
+                })
+            }
+
+            function deletePost(id){
+                console.log("해당 유저를 제거합니다.");
+                $.ajax({
+                    url: "http://localhost:8080/post/delete/" + id,
+                    method: "DELETE",
+                    dataType: "json",
+                    contentType:"application/json",
+                    success: function(data) {
+                        closePostDetail();
+                        showAllPost();
+                    }
+                })
+            }
+        </script>
+    </body>
+    
+</html>

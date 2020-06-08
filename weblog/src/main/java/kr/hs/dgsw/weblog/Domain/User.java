@@ -44,7 +44,7 @@ public class User {
         }catch(NoSuchAlgorithmException e){
             Logger logger = LoggerFactory.getLogger(User.class);
             logger.warn(e.getMessage());
-        }
+        }   
     }
 
     @Column(nullable = false)
