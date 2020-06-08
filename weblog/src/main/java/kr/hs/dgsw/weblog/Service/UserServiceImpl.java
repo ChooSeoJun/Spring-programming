@@ -9,22 +9,22 @@ import org.springframework.stereotype.Service;
 import kr.hs.dgsw.weblog.Domain.User;
 import kr.hs.dgsw.weblog.Repository.UserRepository;
 
-@Service
-public class UserServiceImpl implements UserService{
+@Service // 해당 클래스를 Service로 지정
+public class UserServiceImpl implements UserService{ // 인터페이스 내 함수 기능 구현
     
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository userRepository; // UserRepository 싱글톤으로 생성
 
     @Override
-    public User create(User user){
-        Optional<User> found = userRepository.findByAccount(user.getAccount());
-        if(found.isPresent()) return null;
-        return userRepository.save(user);
+    public User create(User user){ // 유저를 생성하는 함수
+        Optional<User> found = userRepository.findByAccount(user.getAccount()); // 유저 리포지토리에서 들어온 유저의 계정으로 유저 검색 후 found에 저장
+        if(found.isPresent()) return null; // 이미 유저가 존재한다면 null return
+        return userRepository.save(user); // 아니라면 리포지토리에 저장
     }
     
     @Override
-    public User update(Long id, User user){
-        return userRepository.findById(id)
+    public User update(Long id, User user){ // 유저의 정보를 수정하는 함수
+        return userRepository.findById(id) // 리포지토리에서 primary키로 유저 검색, 들어온 값으로 리포지토리에 set
                 .map(found ->{ // update가 되는 애들만 적어주기, id는 업데이트 불가 + auto generate이므로
                     // found.setPassword(Optional.ofNullable(user.getPassword()).orElse(found.getPassword()));
                     found.setName(Optional.ofNullable(user.getName()).orElse(found.getName()));
@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-	public boolean delete(Long id) {
+	public boolean delete(Long id) { // primary키에 해당하는 유저를 삭제하는 함수
 		
 		try {
             userRepository.deleteById(id);
@@ -48,13 +48,13 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public User read(Long id) {
+	public User read(Long id) { // primary키에 해당하는 유저를 삭제하는 함수
         Optional<User> user = userRepository.findById(id);
-        return user.isPresent() ? user.get() : null;
+        return user.isPresent() ? user.get() : null; // 유저가 있다면 반환, 없다면 null return
     }
 
 	@Override
-	public List<User> readAll() {
+	public List<User> readAll() { // 모든 유저를 list형식으로 반환
 		return userRepository.findAll();
 	}
 }

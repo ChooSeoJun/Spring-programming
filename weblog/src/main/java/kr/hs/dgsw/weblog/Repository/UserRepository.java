@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import kr.hs.dgsw.weblog.Domain.User;
 
-@Repository
+@Repository 
 public interface UserRepository extends JpaRepository<User, Long>{
-    Optional<User> findByAccount(String account);
+    Optional<User> findByAccount(String account); // 유저 계정으로 검색
 }

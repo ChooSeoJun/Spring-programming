@@ -36,11 +36,11 @@ public class Post {
     private String content;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true) // 1:N 관계 -> 하나의 포스트에 여러가지 그림이 올라감, Entity 변경시 db의 변경을 결정함 == cascade  /EAGER = 미리 값을 다 불러옴
     private List<Attachment> pictures;
-    @CreationTimestamp
+    @CreationTimestamp // 최초 시간
     @Column(updatable = false, nullable = false) // 갱신 불가 == updatable = false
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime created;
-    @UpdateTimestamp
+    @UpdateTimestamp // 변경 시간
     @Column(nullable = false)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime modified;

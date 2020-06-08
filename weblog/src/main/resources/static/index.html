@@ -38,7 +38,9 @@
                 <span>email</span>
                 <input id="email" type="text"><br>
                 <span>phone</span>
-                <input id="phone" type="text"><br><br>
+                <input id="phone" type="text"><br>
+                <span>profilePath</span>
+                <input id="profilePath" type="text"><br><br>
                 <button onclick="signUp(); return false;">확인</button>
                 <button onclick="clearCells(); return false;">취소</button>
             </form><br><br>
@@ -72,6 +74,7 @@
                 <span>전화번호: </span>
                 <span id="txtUserPhone"></span>
                 <input id="fixedUserPhone"><br>
+
                 <div id="userUpdateButtons">
 
                 </div>
@@ -123,7 +126,6 @@
 
             function findPostByUserId(){
                 var userId = $('#searchById').val();
-                console.log("기본키: " + userId + " 인 유저의 게시물을 불러옵니다.");
                 $.ajax({
                     url: "http://localhost:8080/post/read/user/" + userId,
                     type: "GET",
@@ -146,49 +148,36 @@
             }
 
             function showUserForm(){
-
-                console.log("유저 form 불러오기");
-
                 $('#userForm').show();
                 $('#postForm').hide();
             }
     
             function showPostForm(){
-                console.log("게시물 form 불러오기");
-
                 $('#userForm').hide();
                 $('#postForm').show();
             }
             function clearCells(){
-
-                console.log("회원가입 기입 정보를 제거합니다.");
-
                 $('#name').val("");
                 $('#account').val("");
                 $('#email').val("");
                 $('#password').val("");
                 $('#phone').val("");
+                $('#profilePath').val("");
             }
 
             function clearPostCells(){
-
-                console.log("작성중인 게시물을 제거합니다.");
-
                 $('#postTitle').val("");
                 $('#postContent').val("");
             }
 
 
             function signUp(){
-
-                console.log("회원가입을 진행합니다.");
-
                 let name = $('#name').val();
                 let email = $('#email').val();
                 let password = $('#password').val();
                 let account = $('#account').val();
                 let phone = $('#phone').val();
-
+                let profilePath = $('#profilePath').val();
                 $.ajax({
                     url: "http://localhost:8080/user/create",
                     method: "POST",
@@ -200,20 +189,17 @@
                         email,
                         password,
                         account,
-                        phone
+                        phone,
+                        profilePath
                     }),
                     success: function(res) {
                         window.sessionStorage.setItem("id", res.data.id);
-                        console.log("회원가입이 완료되었습니다.");   
                     }
                 })
                 clearCells();
             }
 
             function createPost(){
-                
-                console.log("게시물 작성을 진행합니다.");
-
                 let title = $('#postTitle').val();
                 let content = $('#postContent').val();
                 let userId = window.sessionStorage.getItem("id");
@@ -237,7 +223,6 @@
                     }),
                     success: function(res) {
                         console.log(res.data);
-                        console.log("게시물 작성이 완료되었습니다.");   
                     },
                     error: function(e){
                         console.log(e);
@@ -249,19 +234,14 @@
             }
 
             function closeUserDetail(){
-                console.log("유저 상세 정보창을 숨깁니다.");
                 $("#userDetail").hide();
             }
 
             function closePostDetail(){
-                console.log("게시물 상세 정보창을 숨깁니다.");
                 $("#postDetail").hide();
             }
 
             function showAllUser(){
-
-                console.log("모든 유저 목록을 불러옵니다.");
-
                 $.ajax({
                     url: "http://localhost:8080/user/read",
                     method: "GET",
@@ -289,9 +269,6 @@
             }
 
             function showAllPost(){
-
-            console.log("모든 게시물 목록을 불러옵니다.");
-
                 $.ajax({
                     url: "http://localhost:8080/post/read",
                     method: "GET",
@@ -317,8 +294,6 @@
             }
 
             function showUserDetail(id){
-
-                console.log("해당 유저의 상세 정보를 불러옵니다.");
                 showUserInfo(id);
 
                 $("#userUpdateButtons").empty();
@@ -334,8 +309,6 @@
             }
 
             function showPostDetail(id){
-
-                console.log("해당 게시물의 상세 정보를 불러옵니다.");
                 showPostInfo(id);
 
                 $("#postUpdateButtons").empty();
@@ -351,7 +324,6 @@
             }
 
             function showUserInfo(id){
-                console.log("수정할 유저의 정보를 불러옵니다.");
                 $.ajax({
                     url: "http://localhost:8080/user/read/" + id,
                     method: "GET",
@@ -373,7 +345,6 @@
             }
 
             function showPostInfo(id){
-                console.log("수정할 게시물의 정보를 불러옵니다.");
                 $.ajax({
                     url: "http://localhost:8080/post/read/" + id,
                     method: "GET",
@@ -488,7 +459,8 @@
                     data:JSON.stringify({
                         name,
                         email,
-                        phone
+                        phone,
+                        profilePath
                     }),
                     success: function(data) {
                         console.log(data);
@@ -520,7 +492,6 @@
             }
 
             function deleteUser(id){
-                console.log("해당 유저를 제거합니다.");
                 $.ajax({
                     url: "http://localhost:8080/user/delete/" + id,
                     method: "DELETE",
@@ -533,8 +504,7 @@
                 })
             }
 
-            function deletePost(id){
-                console.log("해당 유저를 제거합니다.");
+            function deletePost(id){    
                 $.ajax({
                     url: "http://localhost:8080/post/delete/" + id,
                     method: "DELETE",
