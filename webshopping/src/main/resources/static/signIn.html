@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>로그인</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+</head>
+<body>
+<h1>로그인</h1>
+<div>
+    <p>
+        <span>아이디</span>
+        <input id="inputLoginId" type="text"/>
+    </p>
+    <p>
+        <span>패스워드</span>
+        <input id="inputLoginPassword" type="password"/>
+    </p>
+    <button id="btnLogin">확인</button>
+    <button id="btnLoginCancel">취소</button>
+</div>
+
+<script>
+    const ajax = {
+        server: "http://localhost:8080",
+        dataType: "json",
+        contentType: "application/json",
+
+        post: function (endpoint, data, success, error) {
+            $.ajax({
+                url: this.server + endpoint,
+                method: "POST",
+                contentType: this.contentType,
+                data: JSON.stringify(data),
+                success,
+                error,
+            });
+        },
+    };
+    const api={
+        login: function ({account, password}) {
+            return new Promise((resolve, reject) => {
+                ajax.post(
+                    "/api/user/login",
+                    {account, password},
+                    res => {
+                        resolve(res);
+                    }
+                );
+            });
+        },
+    };
+</script>
+
+<script>
+    init();
+
+    function init() {
+        setHandler();
+    }
+
+    function setHandler() {
+        $("#btnLoginCancel").on("click", home);
+        $("#btnLogin").on("click", login);
+    }
+
+    async function login() {
+        const res = await api.login({
+            account: $("#inputLoginId").val(),
+            password: $("#inputLoginPassword").val()
+        });
+
+        console.log(res);
+
+        if (res){
+            alert("로그인 성공");
+            sessionStorage.setItem("userAccount", res.account);
+            sessionStorage.setItem("userId",res.id);
+            home();
+        }   
+        
+    }
+
+    function home() {
+        location.href = "index.html";
+    }
+</script>
+</body>
+</html>

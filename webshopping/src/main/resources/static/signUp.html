@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>회원가입</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+</head>
+<body>
+<h1>회원가입</h1>
+<div>
+    <p>
+        <span>아이디</span>
+        <input id="regiId" type="text">
+    </p>
+    <p>
+        <span>패스워드</span>
+        <input id="regiPassword" type="password">
+    </p>
+    <p>
+        <span>패스워드확인</span>
+        <input id="regiPasswordCheck" type="password">
+    </p>
+    <p>
+        <span>성명</span>
+        <input id="regiUserName" type="text">
+    </p>
+    <p>
+        <span>전화번호</span>
+        <input id="regiTel" type="text">
+    </p>
+    <p>
+        <span>핸드폰</span>
+        <input id="regiPhone" type="text">
+    </p>
+    <p>
+        <span>우편번호</span>
+        <input id="regiZipCodeFirst" type="text">
+        <span> - </span>
+        <input id="regiZipCodeSecond" type="text">
+    </p>
+    <p>
+        <span>주소</span>
+    <p>
+        <input id="regiAddressFirst" type="text">
+    </p>
+    <p>
+        <input id="regiAddressSecond" type="text">
+    </p>
+    </p>
+    <p>
+        <span>이메일</span>
+        <input id="regiEmail" type="email">
+    </p>
+    <button id="btnRegisterOK">확인</button>
+    <button id="btnRegisterCancel">취소</button>
+</div>
+
+<script>
+    const ajax = {
+        server: "http://localhost:8080",
+        dataType: "json",
+        contentType: "application/json",
+
+        get: function (endpoint, success, error) {
+            $.ajax({
+                url: this.server + endpoint,
+                method: "GET",
+                dataType: this.dataType,
+                success,
+                error
+            });
+        },
+        post: function (endpoint, data, success, error) {
+            $.ajax({
+                url: this.server + endpoint,
+                method: "POST",
+                contentType: this.contentType,
+                data: JSON.stringify(data),
+                success,
+                error:console.log(data),
+            });
+        },
+        put: function (endpoint, data, success, error) {
+            $.ajax({
+                url: this.server + endpoint,
+                method: "PUT",
+                contentType: this.contentType,
+                data: JSON.stringify(data),
+                success,
+                error,
+            });
+        },
+        delete: function (endpoint, success, error) {
+            $.ajax({
+                url: this.server + endpoint,
+                method: "DELETE",
+                dataType: this.dataType,
+                success,
+                error,
+            });
+        },
+    };
+
+    const api = {
+        register: function ({account, password, username, tel, phone, zipcode, address, email}) {
+            return new Promise((resolve, reject) => {
+                ajax.post(
+                    "/api/user",
+                    {account, password, username, tel, phone, zipcode, address, email},
+                    res => {
+                        resolve(res);
+                    }
+                );
+            });
+        },
+    };
+</script>
+
+<script>
+    init();
+
+    function init() {
+        setHandler();
+    }
+
+    function setHandler() {
+        $("#btnRegisterOK").on("click", register);
+        $("#btnRegisterCancel").on("click", home);
+    }
+
+    async function register() {
+        if ($("#regiPassword").val() !== $("#regiPasswordCheck").val())
+            return alert("비밀번호 확인에 실패했습니다");
+
+        const res = await api.register({
+            account: $("#regiId").val(),
+            password: $("#regiPassword").val(),
+            username: $("#regiUserName").val(),
+            tel: $("#regiTel").val(),
+            phone: $("#regiPhone").val(),
+            zipcode: $("#regiZipCodeFirst").val() + $("#regiZipCodeSecond").val(),
+            address: $("#regiAddressFirst").val() + $("#regiAddressSecond").val(),
+            email: $("#regiEmail").val()
+        });
+
+        console.log(res);
+        home();
+    }
+
+    function home() {
+        location.href = "index.html";
+    }
+</script>
+</body>
+</html>

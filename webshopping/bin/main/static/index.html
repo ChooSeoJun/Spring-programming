@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>WEBSHOPPING</title>
+        <meta charset="UTF-8">
+        <style>
+            nav {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                position: relative;
+                background-color: black;
+            }
+
+            ul, li {
+                margin: 0;
+                padding: 0;
+                list-style: none;
+            }
+
+            #main-menu > li , a{
+                float: left;
+                position: relative;
+            }
+
+            #main-menu > li , a {
+                font-size: 0.85rem;
+                color: rgba(255,255,255,0.85);
+                text-align: center;
+                text-decoration: none;
+                letter-spacing: 0.05em;
+                display: block;
+                padding: 14px 36px;
+                border-right: 1px solid rgba(255,255,255,0.5);
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+            }
+
+            #main-menu > li:nth-child(1){
+                border-left: 1px solid rgba(255,255,255,0.5);
+            }
+
+            #start {
+                border: 1px solid black;
+                width: 100%;
+            }
+            table {
+                width: 100%;
+            }
+            table td .sort {
+                width: 0;
+                height: 0;
+            }
+
+        </style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script>
+
+            function showAllCategory(){
+                $.ajax({
+                    url: "http://localhost:8080/api/menu",
+                    method: "GET",
+                    dataType: "json",
+                    contentType:"application/json",
+                    success: function(res) {
+                        $('#main-menu').empty();
+                        res.forEach(function(item,index,list){
+                            console.log(item);
+                            var html = 
+                            `<li onclick=showItemByMenuId(${item.id});>${item.name}</li>`;
+                            $('#main-menu').append(html);
+                        })
+                    },
+                    error: function(data){
+                        console.log(data);
+                    }
+                })
+            }
+
+            function showItemByMenuId(menuId){
+                $.ajax({
+                    url: "http://localhost:8080/api/product/menuId",
+                    method: "GET",
+                    dataType: "json",
+                    contentType:"application/json",
+                    data:{
+                        menuId
+                    },
+                    success: function(res) {
+                        $('#productList').empty();
+                        var html = `<tr><td class="sort"></td></tr>`;
+                        $('#productList').append(html);
+                        res.forEach(function(item,index,list){
+                            console.log(item);
+                            var html =`
+                                <td onclick=showProduct(${item.id})>
+                                    <div>${item.name}</div>
+                                    <div>
+                                        <span class="minfont">가격: </span>
+                                        <span class="minmoney">${item.price}</span>원
+                                    </div>
+                                </td>
+                                `;
+
+                            $('#productList td:last').after(html);
+                        })
+                    },
+                    error: function(data){
+                        console.log(data);
+                    }
+                })
+            }
+
+            function userCheck(){
+                console.log(sessionStorage.getItem("userAccount"));
+                if(sessionStorage.getItem("userAccount") === null){
+
+                    $('#signIn').text("로그인");
+                    $('#signIn').attr("href","signIn.html");
+                }
+                else{
+                    $('#signIn').text("로그아웃");
+                    $('#signIn').attr("onclick","logout();");
+                }
+            }
+
+            function logout(){
+                console.log("success");
+                sessionStorage.clear();
+                location.href="index.html";
+            }
+
+            function showProduct(id) {
+                location.href = `product.html?id=${id}`;
+            }
+
+            function getReview(id) {
+                console.log(id);
+            }
+        </script>
+    </head>
+    
+    <body onload="showAllCategory(); userCheck();">    
+        <nav role="navigation">
+            <ul id="main-menu">
+            </ul>
+            <a id="signIn"></a>
+            <a href="signUp.html">회원가입</a>
+            <a href="cart.html">장바구니</a>
+          </nav>
+        <div id="my-panel">
+        </div>
+        <div id="product-panel">
+            <table id="productList">
+                <tr>
+                    <td class="sort"></td>
+                </tr>
+            </table>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.hs.dgsw.webshopping.Domain.ReviewMapper">
+
+    <insert id="add" parameterType="kr.hs.dgsw.webshopping.Domain.Review">
+        insert into review(productId, userId, content)
+        values(#{productId}, #{userId}, #{content})
+        <selectKey keyProperty="id" resultType="Long">
+            select last_insert_id()
+        </selectKey>
+    </insert>
+
+    <update id="modify" parameterType="kr.hs.dgsw.webshopping.Domain.Review">
+        update review
+        set content=#{content}
+        where id=#{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from review
+        where id=#{id}
+    </delete>
+
+    <select id="findByProductId" parameterType="Long" resultType="HashMap">
+        select r.id, r.productId as productId, r.userId as userId, u.account, r.content, r.created
+        from review r left join user u on r.userId = u.id
+        where productId=#{productId}
+    </select>
+</mapper>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <title>주문</title>
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+        <style>
+            .product {
+                border-color: royalblue;
+                border-collapse: separate;
+                border-spacing: 0 10px;
+                height: 300px; width: 100%;
+            }
+            .review {
+                border-color: navy;
+                border-collapse: separate;
+                border-spacing: 0 10px;
+                width: 100%;
+            }
+            input {
+                width: 70px;
+            }
+            .form {
+                text-align: center;
+            }
+            .wrap {
+                width: 50%;
+            }
+            .pro-title {
+                width: 20%;
+            }
+            .pro-details-title {
+                width: 20%;
+            }
+            .rev-id {
+                width: 20%;
+            }
+            .rev-content {
+                width: 60%;
+            }
+            .rev-date {
+                width: 20%;
+                position: relative;
+            }
+            .rev-write {
+                position: absolute;
+                top: 0px;
+                right: 0px;
+            }
+            .review-modal-content {
+                margin: 15% auto;
+                padding: 20px;
+                border: 1px solid navy;
+                width: 70%;
+            }
+            .payment-modal-content {
+                margin: 15% auto;
+                padding: 20px;
+                border: 1px solid royalblue;
+                width: 70%;
+            }
+            .rev-input {
+                width: 100%;
+                height: 50px;
+            }
+        </style>
+    </head>
+    <body>
+        <table class="product">
+            <tr>
+                <td>
+                    <table border="1" class="product">
+                        <tr align="center">
+                            <td class="pro-title">상품명</td>
+                            <td class="pro-content" id="name"></td>
+                        </tr>
+                        <tr align="center">
+                            <td>가격</td>
+                            <td id="price"></td>
+                        </tr>
+                        <tr align="center">
+                            <td>수량</td>
+                            <td><input type="number" id="quantity"></td>
+                        </tr>
+                        <tr align="center">
+                            <td>출판사</td>
+                            <td id="factory"></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <table border="1" class="product">
+                <tr align="center">
+                    <td class="pro-details-title">상품 설명</td>
+                    <td class="pro-details" id="details"></td>
+                </tr>
+                <tr align="center">
+                    <td colspan="2">
+                        <input type="submit" value="결제하기" id="payment">
+                        <input type="submit" value="장바구니" id="cart">
+                        <button onclick="home();">홈</button>
+                    </td>
+                </tr>
+            </table>
+        </table>
+        
+        <table border="1" id="review" class="review">
+            <tr id="asdf">
+                <td class="rev-id">아이디</td>
+                <td class="rev-content">내용</td>
+                <td class="rev-date">날짜<input type="button" value="작성하기" id="rev-write" class="rev-write"></td>
+            </tr>
+        </table>
+
+        <div id="rev-modal" class="searchModal">
+            <div class="review-modal-content">
+                <div>
+                    <h3>Review</h1>
+                </div>
+                <div>
+                    <input id="rev-input" class="rev-input" type="text"/>
+                </div>
+                <input id="rev-modal-btn-close" class="modal-btn" type="button" value="취소"/>
+                <input id="rev-modal-btn-confirm" class="modal-btn" type="button" value="확인"/>
+            </div>
+        </div>
+
+        <div id="pay-modal" class="searchModal">
+            <div class="payment-modal-content">
+                <div>
+                    <h3>결제</h1>
+                </div>
+                <div>
+                    <table border="1" class="product">
+                        <tr align="center">
+                            <td class="pro-title">상품명</td>
+                            <td class="pro-content" id="pay-name"></td>
+                        </tr>
+                        <tr align="center">
+                            <td>가격</td>
+                            <td id="pay-price"></td>
+                        </tr>
+                        <tr align="center">
+                            <td>수량</td>
+                            <td id="pay-quantity"></td>
+                        </tr>
+                        <tr align="center">
+                            <td>총합</td>
+                            <td id="pay-total"></td>
+                        </tr>
+                        
+                    </table>
+                </div>
+                <input id="pay-modal-btn-close" class="modal-btn" type="button" value="취소"/>
+                <input id="pay-modal-btn-confirm" class="modal-btn" type="button" value="확인"/>
+            </div>
+        </div>
+
+        <script>
+            var productId;
+            var menuId;
+            var submenuId;
+            var name;
+            var price;
+            var details;
+            var factory;
+
+            var loginId;
+
+            function getUrlParams() {
+                var params = {};
+                window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(str, key, value) { params[key] = value; });
+                return params;
+            }
+
+            function getProduct() {
+                var id = getUrlParams().id;
+                loginId = sessionStorage.getItem("userId");
+                
+                $.ajax({
+                    method : "GET",
+                    contentType : 'application/json',
+                    dataType : 'JSON',
+                    url : "http://localhost:8080/api/product/id",
+                    data:{
+                        id
+                    },
+                    success: function(data) {
+                        console.log(data);
+                        setProduct(data);
+                        getReview();
+                    },
+                    error: function (data) {
+                        console.log(data);
+                    }
+                });
+            }
+
+            function setProduct(data) {
+                productId = data.id;
+                menuId = data.menuId;
+                name = data.name;
+                price = data.price;
+                details = data.details;
+                factory = data.factory;
+
+                $("#name").html(name);
+                $("#factory").html(factory);
+                $("#details").html(details);
+                $("#price").html(price);
+                $("#quantity").val(1);
+            }
+
+            function getReview() {
+                $.ajax({
+                    method : "GET",
+                    dataType : 'JSON',
+                    url : `http://localhost:8080/api/review/${productId}`,
+                    success: function(data) {
+                        data.forEach(x => {
+                            setReview(x);
+                        });
+                    },
+                    error: function (data) {
+                        console.log(data);
+                    }
+                });
+            }
+
+            function setReview(data) {
+                var account = data.account;
+                var content = data.content;
+                var created = data.created;
+                var time = created.split("T");
+
+                var text =  
+                    `<tr>
+                        <td class="rev-id">${account}</td>
+                        <td class="rev-content">${content}</td>
+                        <td class="rev-date">${time[0]}<br>${time[1]}</td>
+                    </tr>`;
+
+                $('#review tr:last').after(text);
+            }
+
+            function clearReview() {
+                $('#review tr:not(:first)').remove();
+
+                getReview();
+
+                $("#rev-input").val("");
+            }
+
+            $(document).ready(function () {
+                getProduct();
+            });
+
+            $("#payment").click(function() {
+                if($("#quantity").val() <= 0 || $("#quantity").val() == undefined) {
+                    alert("상품은 하나 이상 주문해야합니다.")
+                }
+                else {
+                    $("#pay-modal").show();
+                    $("#pay-name").html(name);
+                    $("#pay-price").html(price);
+                    $("#pay-quantity").html($("#quantity").val());
+                    $("#pay-total").html(price * $("#quantity").val());
+                    console.log(price);
+                    console.log(quantity);
+                    console.log(price * quantity);
+                }
+            })
+
+            $("#cart").click(function() {
+                var quantity = $("#quantity").val();
+
+                if(quantity <= 0 || quantity == undefined) {
+                    alert("상품은 하나 이상 주문해야합니다.");
+                    return;
+                }
+
+                if(confirm("장바구니에 넣으시겠습니까?")) {
+                    $.ajax({
+                        method : "POST",
+                        contentType : 'application/json',
+                        dataType : 'JSON',
+                        url : "http://localhost:8080/api/cart",
+                        data : JSON.stringify ({
+                            userId: loginId,
+                            productId: productId,
+                            price: price,
+                            amount: quantity,
+                            total: price * quantity
+                        }),
+                        success: function(data) {
+                            clearReview();
+
+                            $('#modal').hide();
+                        },
+                        error: function (data) {
+                            console.log(data);
+                        }
+                    });
+                }
+            })
+
+            $("#rev-write").click(function() {
+                $("#rev-modal").show();
+            });
+
+            $("#rev-modal-btn-close").click(function() {
+                $('#rev-modal').hide();
+            });
+
+            $("#rev-modal-btn-confirm").click(function() {
+                var content = $("#rev-input").val();
+
+                $.ajax({
+                    method : "POST",
+                    contentType : 'application/json',
+                    dataType : 'JSON',
+                    url : "http://localhost:8080/api/review",
+                    data : JSON.stringify ({
+                        userId: loginId,
+                        productId: productId,
+                        content: content
+                    }),
+                    success: function(data) {
+                        clearReview();
+                        $('.searchModal').hide();
+                    },
+                    error: function (data) {
+                        console.log(data);
+                    }
+                });
+            });
+
+            $("#pay-modal-btn-close").click(function() {
+                $('#pay-modal').hide();
+            });
+
+            $("#pay-modal-btn-confirm").click(function() {
+                alert("결제가 완료되었습니다.");
+                $('#pay-modal').hide();
+                home();
+            });
+
+            function home(){
+                location.href="index.html";
+            }
+        </script>
+    </body>
+</html>
